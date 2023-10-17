@@ -83,3 +83,64 @@ redis.conf由一系列格式简单的配置项组成：
 &emsp;&emsp;&emsp;&emsp;default：0  
 &emsp;&emsp;&emsp;&emsp;content：`timeout 0`  
 &emsp;&emsp;&emsp;&emsp;客户端空闲连接超时时间，单位为秒，默认为0（不超时）  
+
+# &emsp;&emsp;loglevel  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：verbose  
+&emsp;&emsp;&emsp;&emsp;content：`loglevel verbose`  
+&emsp;&emsp;&emsp;&emsp;设置redis服务端的日志级别  
+|级别|信息|
+|--|--|
+|debug|适用于开发、测试模式，会打印尽可能多的信息|    
+|verbose|打印的信息比debug少一些，打印一些必要信息|  
+|notice|打印的信息更少，主要是一些需要关注的警告及报错信息|  
+|warning|只打印非常重要/致命的信息|  
+
+## &emsp;&emsp;logfile  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：stdout  
+&emsp;&emsp;&emsp;&emsp;content：`logfile stdout`  
+&emsp;&emsp;&emsp;&emsp;指定redis-server的日志打印文件位置，如果配置成stdout的话，会打印到系统标准输出流，如果配置了daemonize的话，日志将会被发送到/dev/null  
+
+## &emsp;&emsp;syslog-enabled  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：no  
+&emsp;&emsp;&emsp;&emsp;content：`syslog-enabled no`  
+&emsp;&emsp;&emsp;&emsp;启用syslog，关于syslog的配置可以参考[redis启用syslog或dockerlog]("https://betterstack.com/community/guides/logging/how-to-start-logging-with-redis/#step-1-configuring-logging-with-syslog")  
+
+## &emsp;&emsp;syslog-ident  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：redis  
+&emsp;&emsp;&emsp;&emsp;content：`syslog-ident redis`  
+&emsp;&emsp;&emsp;&emsp;启用syslog后，配置当前进程日志的唯一标识，关于syslog的配置可以参考[redis启用syslog或dockerlog]("https://betterstack.com/community/guides/logging/how-to-start-logging-with-redis/#step-1-configuring-logging-with-syslog")  
+
+## &emsp;&emsp;syslog-facility  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：local0  
+&emsp;&emsp;&emsp;&emsp;content：`syslog-facility local0`  
+&emsp;&emsp;&emsp;&emsp;启用syslog后，配置输出级别，可以参考[What are Syslog Facilities and Levels]("https://success.trendmicro.com/dcx/s/solution/TP000086250?language=en_US")  
+
+
+## &emsp;&emsp;databases  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：16  
+&emsp;&emsp;&emsp;&emsp;content：`databases 16`  
+&emsp;&emsp;&emsp;&emsp;配置redis的数据库数量
+
+## &emsp;&emsp;save  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：3600 1 300 100 60 10000  
+&emsp;&emsp;&emsp;&emsp;content：`save 3600 1 300 100 60 10000`  
+&emsp;&emsp;&emsp;&emsp;配置redis的持久化策略，默认是关闭的（被注释掉了），语法为save \<seconds\> \<changes\> \[\<seconds\> \<changes\> ...\]，也可以配置成多行，第一个参数表示持久化冷却时间，第二个参数表示至少需要发生多少次写入。任意一个条件满足即会持久化数据。  
+
+## &emsp;&emsp;rdbcompression  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：yes  
+&emsp;&emsp;&emsp;&emsp;content：`rdbcompression yes`  
+&emsp;&emsp;&emsp;&emsp;使用lzf压缩算法来压缩rdb文件，启用会导致cpu消耗增加，关闭会导致rdb文件体积增大。  
+
+## &emsp;&emsp;dbfilename  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：dump.rdb  
+&emsp;&emsp;&emsp;&emsp;content：`dbfilename dump.rdb`  
+&emsp;&emsp;&emsp;&emsp;rdb文件的名称，注意这里不能配置成路径，仅仅是文件名称，保存路径需要通过dir配置参数配置。
