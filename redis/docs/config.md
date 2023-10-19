@@ -199,4 +199,32 @@ redis.conf由一系列格式简单的配置项组成：
 &emsp;&emsp;&emsp;&emsp;sinece：2.4  
 &emsp;&emsp;&emsp;&emsp;default：无  
 &emsp;&emsp;&emsp;&emsp;content：`rename-command CONFIG ""`  
-&emsp;&emsp;&emsp;&emsp;redis密码，配置了该选项后，客户端访问redis时会要求使用AUTH鉴权才能进行后续操作。需要注意外部用户可以以高达15w/s的频率尝试密码，因此要保证配置的密码是一个随机强密码，否则很容易被破解
+&emsp;&emsp;&emsp;&emsp;重命名命令，在不可信环境下可以讲一些敏感命令重命名为不容易被猜到的命令，从而规避通用客户端采用通用命令来执行相关操作
+
+## &emsp;&emsp;maxclients  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：0  
+&emsp;&emsp;&emsp;&emsp;content：`maxclients 128`  
+&emsp;&emsp;&emsp;&emsp;最大连接数，默认为0（无限制），redis会在连接数达到这个值后，向新建连接返回‘max number of clients reached’报错
+
+## &emsp;&emsp;maxmemory  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：无  
+&emsp;&emsp;&emsp;&emsp;content：`maxmemory <bytes>`  
+&emsp;&emsp;&emsp;&emsp;redis使用的最大内存大小。当redis使用的内存超过该配置项后，redis会尝试通过内存驱逐策略（maxmemmory-policy）来删除key从而释放内存，当redis无法移除key或者内存策略被设置为noeviction时，redis会只响应读取命令，对于写入命令会报内存不足的错误。  
+&emsp;&emsp;&emsp;&emsp;需要注意如果实例存在从实例时，配置该选项需要讲主从复制所需要的缓冲区内存剔除掉，否则可能会导致实例进入一个驱逐循环：网络问题或主从同步时，key内存+outbuffer超过占用内存大小，实例执行key驱逐，如此循环直至实例清空。简单说如果实例存在slave，则需要尽量调高这个maxmemory占用，为主从同步的outbuffer留下空间，同时也需要为操作系统留下足够的RAM空间供数据传输使用（驱逐策略为noeviction时不需要考虑这一点）
+
+## &emsp;&emsp;maxmemory-policy  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：volatile-lru  
+&emsp;&emsp;&emsp;&emsp;content：`maxmemory-policy volatile-lru`  
+&emsp;&emsp;&emsp;&emsp;该配置项用于配置内存驱逐策略：  
+|策略名称|策略行为|
+|--|--|
+|volatile-lru|在设置了过期时间的key范围内，淘汰最久未使用的key|
+|allkeys-lru|对所有的key执行LRU算法|
+|volatile-random|在设置了过期时间的key范围内，随机淘汰|
+|allkeys->random|对所有的key随机淘汰|
+|volatile-ttl|在设置了过期时间的key中，淘汰最接近过期时间的key|
+|noeviction|不淘汰|  
+
