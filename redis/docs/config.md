@@ -143,4 +143,60 @@ redis.conf由一系列格式简单的配置项组成：
 &emsp;&emsp;&emsp;&emsp;sinece：2.4  
 &emsp;&emsp;&emsp;&emsp;default：dump.rdb  
 &emsp;&emsp;&emsp;&emsp;content：`dbfilename dump.rdb`  
-&emsp;&emsp;&emsp;&emsp;rdb文件的名称，注意这里不能配置成路径，仅仅是文件名称，保存路径需要通过dir配置参数配置。
+&emsp;&emsp;&emsp;&emsp;rdb文件的名称，注意这里不能配置成路径，仅仅是文件名称，保存路径需要通过dir配置参数配置。  
+
+## &emsp;&emsp;dir  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：./  
+&emsp;&emsp;&emsp;&emsp;content：`dir ./`  
+&emsp;&emsp;&emsp;&emsp;工作文件目录，rdb文件和aof文件都会被保存到该目录下。  
+
+## &emsp;&emsp;slaveof  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：无  
+&emsp;&emsp;&emsp;&emsp;content：`slaveof <masterip> <masterport>`  
+&emsp;&emsp;&emsp;&emsp;主从复制配置项，将当前实例作为从实例启动，从实例也是一个独立的实例，其也可以配置自己的数据持久化策略、对外暴露端口等  
+
+## &emsp;&emsp;masterauth  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：无  
+&emsp;&emsp;&emsp;&emsp;content：`masterauth <master-password>`  
+&emsp;&emsp;&emsp;&emsp;主从复制配置项，如果master需要密码健全，则此处需要配置主实例的访问密码
+
+## &emsp;&emsp;slave-serve-stale-data  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：yes  
+&emsp;&emsp;&emsp;&emsp;content：`slave-serve-stale-data yes`  
+&emsp;&emsp;&emsp;&emsp;当主从实例连接丢失时，副本的对外策略：  
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;1、当slave-serve-stale-data设置为yes时，副本节点会以当前节点的数据响应客户端仓库，需要注意此时的数据可能与主实例的存在差异（过期数据）  
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;2、当slave-serve-stale-data设置为false时，副本节点会返回给客户端"SYNC with master in progress"错误，但是INFO和SLAVEOF命令依然可以正常执行
+
+## &emsp;&emsp;repl_ping_slave_period  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：10  
+&emsp;&emsp;&emsp;&emsp;content：`repl-ping-slave-period 10`  
+&emsp;&emsp;&emsp;&emsp;副本心跳发送间隔，单位为s，副本会以该参数指定的时间间隔向master发送PING命令
+
+## &emsp;&emsp;repl-timeout  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：60  
+&emsp;&emsp;&emsp;&emsp;content：`repl-timeout 60`  
+&emsp;&emsp;&emsp;&emsp;主副本超时时间，单位为s；该超时时间控制几乎所有的主副本之间的操作，例如主副本数据传递的IO超时、主实例数据或PING响应超时时间等。一个很重要的点是这个时间应该比repl_ping_slave_period大，否则当主从之间流量很低时，slave会认为主从超时
+
+## &emsp;&emsp;slave-priority  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：100  
+&emsp;&emsp;&emsp;&emsp;content：`slave-priority 100`  
+&emsp;&emsp;&emsp;&emsp;副本优先级，该参数是sentinel用来选主时的参考，sentinel会选择优先级最小的slave作为新的master，但是需要注意的是0代表不参与选举，即sentinel永远不会选择一个slave-priority为0的slave实例作为新master
+
+## &emsp;&emsp;requirepass  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：无  
+&emsp;&emsp;&emsp;&emsp;content：`requirepass foobared`  
+&emsp;&emsp;&emsp;&emsp;redis密码，配置了该选项后，客户端访问redis时会要求使用AUTH鉴权才能进行后续操作。需要注意外部用户可以以高达15w/s的频率尝试密码，因此要保证配置的密码是一个随机强密码，否则很容易被破解
+
+## &emsp;&emsp;rename-command  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：无  
+&emsp;&emsp;&emsp;&emsp;content：`rename-command CONFIG ""`  
+&emsp;&emsp;&emsp;&emsp;redis密码，配置了该选项后，客户端访问redis时会要求使用AUTH鉴权才能进行后续操作。需要注意外部用户可以以高达15w/s的频率尝试密码，因此要保证配置的密码是一个随机强密码，否则很容易被破解
