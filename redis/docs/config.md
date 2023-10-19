@@ -228,3 +228,8 @@ redis.conf由一系列格式简单的配置项组成：
 |volatile-ttl|在设置了过期时间的key中，淘汰最接近过期时间的key|
 |noeviction|不淘汰|  
 
+## &emsp;&emsp;maxmemory-samples  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：3  
+&emsp;&emsp;&emsp;&emsp;content：`maxmemory-samples 3`  
+&emsp;&emsp;&emsp;&emsp;redis驱逐策略所选择的key并不是绝对精准的，而是在选择范围内通过采样来确定要删除哪些key，因此可以通过修改该参数，来调整redis每次采样时选择的样本集的大小
