@@ -233,3 +233,86 @@ redis.conf由一系列格式简单的配置项组成：
 &emsp;&emsp;&emsp;&emsp;default：3  
 &emsp;&emsp;&emsp;&emsp;content：`maxmemory-samples 3`  
 &emsp;&emsp;&emsp;&emsp;redis驱逐策略所选择的key并不是绝对精准的，而是在选择范围内通过采样来确定要删除哪些key，因此可以通过修改该参数，来调整redis每次采样时选择的样本集的大小
+
+## &emsp;&emsp;appendonly  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：no  
+&emsp;&emsp;&emsp;&emsp;content：`appendonly no`  
+&emsp;&emsp;&emsp;&emsp;是否开启AOF策略，AOF是redis的另一种持久化策略，可以和RDB持久化同时使用，RDB会根据save配置的持久化策略定期将整个数据集持久化到硬盘，因为持久化过程比较重，因此一般适用于允许部分数据丢失的场景（两次持久化间隔中发生CRASH时会导致写入的数据丢失）。AOF持久化策略则适用于不希望丢失任何数据的场景，但是因为写入命令不停的持久化到AOF文件中，因此可能会导致持久化文件很大，因此需要注意BGREWRITEAOF的配置，它可以在AOF文件过大时重写AOF文件。
+
+## &emsp;&emsp;appendfilename  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：appendonly.aof  
+&emsp;&emsp;&emsp;&emsp;content：`appendfilename appendonly.aof`  
+&emsp;&emsp;&emsp;&emsp;配置AOF持久化文件的名称，默认为appendonly.aof
+
+## &emsp;&emsp;appendfsync  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：everysec  
+&emsp;&emsp;&emsp;&emsp;content：`appendfsync everysec`  
+&emsp;&emsp;&emsp;&emsp;AOF的写入策略：当符合策略时，redis会调用fsync()来通知系统将缓存中的数据写入到磁盘，一些系统会立即执行，但是也有的系统会尽可能去执行   
+|策略名称|意义|
+|--|--|
+|no|不会主动调用fsync通知系统持久化缓冲区数据，有操作系统自行决定何时flush，持久化速度快，但是依然存在数据丢失的可能性|
+|always|每当有写入命令被执行时，立即调用fsync持久化该数据，会造成大量的磁盘写入，因此速度最慢，但是最安全|
+|everysec|两次fsync的调用间隔不会小于1s，数据安全和写入速度的折中选项|
+
+
+## &emsp;&emsp;no-appendfsync-on-rewrite  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：no  
+&emsp;&emsp;&emsp;&emsp;content：`no-appendfsync-on-rewrite no`  
+&emsp;&emsp;&emsp;&emsp;当AOF的fsync策略不为no时，那么当一个后台存储进程（如save或AOF重写时），磁盘将面临大量的IO操作，在一些linux配置中，redis将会阻塞在fsync操作中，此时没有办法可以使redis恢复。因此为了解决这个问题，可以在BGSAVE或BGREWRITEAOF执行过程中禁用fsync。这意味着当另一个子进程在执行持久化时，执行期间redis的fsync策略将退化为no，在linux的默认策略下，可能存在最多30s数据丢失的隐患。只有在redis实例面临延迟问题时才考虑设置该选项为yes，否则保持默认值no就可以了。
+
+## &emsp;&emsp;auto-aof-rewrite-percentage  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：100  
+&emsp;&emsp;&emsp;&emsp;content：`auto-aof-rewrite-percentage 100`  
+&emsp;&emsp;&emsp;&emsp;当AOF文件增长超过多少时重写
+
+## &emsp;&emsp;auto-aof-rewrite-min-size  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：64mb  
+&emsp;&emsp;&emsp;&emsp;content：`auto-aof-rewrite-min-size 64mb`  
+&emsp;&emsp;&emsp;&emsp;AOF重写的基准大小。   
+&emsp;&emsp;&emsp;&emsp;AOF重写可以通过手动调用BGREWRITEAOF命令实现，也可以通过配置auto-aof-rewrite-percentage及auto-aof-rewrite-min-size来使其自动执行。redis会记录启动时或最后一次重写时AOF的文件大小，当当前AOF文件的大小与记录的大小超过一定的比例（auto-aof-rewrite-percentage）时，会自动触发AOF重写。当然有一个最小阈值（auto-aof-rewrite-min-size），即当AOF文件不超过这个大小时，不考虑对其进行重写  
+
+## &emsp;&emsp;slowlog-log-slower-than  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：10000  
+&emsp;&emsp;&emsp;&emsp;content：`slowlog-log-slower-than 10000`  
+&emsp;&emsp;&emsp;&emsp;命令被慢日志记录的阈值，单位毫秒。redis会统计命令的执行时间，超过指定时间的命令会被记录到慢日志中，用户可以通过slowlog命令查看慢日志的相关信息。需要注意的是redis只会统计命令的实际执行时间，并不会统计IO的时间。0的话会统计所有命令，负数的话不进行统计
+
+## &emsp;&emsp;slowlog-max-len  
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：128  
+&emsp;&emsp;&emsp;&emsp;content：`slowlog-max-len 128`  
+&emsp;&emsp;&emsp;&emsp;慢日志的记录数量，循环记录。可以通过SLOWLOG RESET命令来清空慢日志，从而节省内存
+
+## &emsp;&emsp;~~vm-enabled~~  
+&emsp;&emsp;&emsp;&emsp;***@Deprecated***   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：no  
+&emsp;&emsp;&emsp;&emsp;content：`vm-enabled no`  
+&emsp;&emsp;&emsp;&emsp;虚拟内存允许redis使用比实际RAM更大的内存，可以将不常用的数据保存到SWAP分区。***需要注意VM特性在2.4版本中已废弃，后续不建议使用***
+
+## &emsp;&emsp;~~vm-swap-file~~  
+&emsp;&emsp;&emsp;&emsp;***@Deprecated***   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：/tmp/redis.swap  
+&emsp;&emsp;&emsp;&emsp;content：`vm-swap-file /tmp/redis.swap`  
+&emsp;&emsp;&emsp;&emsp;redis交换文件的地址，注意不同的redis实例应该使用不同的交换文件，交换文件所在的磁盘最好使用SSD，为了保证安全，最好为redis单独创建一个文件夹，并将文件夹的权限授予redis的启动用户，避免其他进程触及到该文件。***需要注意VM特性在2.4版本中已废弃，后续不建议使用***
+
+## &emsp;&emsp;~~vm-max-memory~~  
+&emsp;&emsp;&emsp;&emsp;***@Deprecated***   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：0  
+&emsp;&emsp;&emsp;&emsp;content：`vm-max-memory 0`  
+&emsp;&emsp;&emsp;&emsp;SWAP文件的最大大小 ***需要注意VM特性在2.4版本中已废弃，后续不建议使用***
+
+## &emsp;&emsp;~~vm-page-size 32~~  
+&emsp;&emsp;&emsp;&emsp;***@Deprecated***   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：32  
+&emsp;&emsp;&emsp;&emsp;content：`vm-page-size 32`  
+&emsp;&emsp;&emsp;&emsp;Redis虚拟内存的页大小，单位byte，一个对象可以使用多个连续页存储，但是一个页却不能存储多个对象，因此当页配置过大时，会造成资源浪费。当redis实例以小对象为主时，页面大小建议设置为64或32byte，如果以大对象为主的话，则根据实际调大即可 ***需要注意VM特性在2.4版本中已废弃，后续不建议使用***
