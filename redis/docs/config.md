@@ -310,9 +310,77 @@ redis.conf由一系列格式简单的配置项组成：
 &emsp;&emsp;&emsp;&emsp;content：`vm-max-memory 0`  
 &emsp;&emsp;&emsp;&emsp;SWAP文件的最大大小 ***需要注意VM特性在2.4版本中已废弃，后续不建议使用***
 
-## &emsp;&emsp;~~vm-page-size 32~~  
+## &emsp;&emsp;~~vm-page-size~~  
 &emsp;&emsp;&emsp;&emsp;***@Deprecated***   
 &emsp;&emsp;&emsp;&emsp;sinece：2.4  
 &emsp;&emsp;&emsp;&emsp;default：32  
 &emsp;&emsp;&emsp;&emsp;content：`vm-page-size 32`  
 &emsp;&emsp;&emsp;&emsp;Redis虚拟内存的页大小，单位byte，一个对象可以使用多个连续页存储，但是一个页却不能存储多个对象，因此当页配置过大时，会造成资源浪费。当redis实例以小对象为主时，页面大小建议设置为64或32byte，如果以大对象为主的话，则根据实际调大即可 ***需要注意VM特性在2.4版本中已废弃，后续不建议使用***
+
+## &emsp;&emsp;~~vm-pages~~  
+&emsp;&emsp;&emsp;&emsp;***@Deprecated***   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：134217728  
+&emsp;&emsp;&emsp;&emsp;content：`vm-pages 134217728`  
+&emsp;&emsp;&emsp;&emsp;Redis虚拟内存页数，每8页将会在RAM中消耗1byte，swap文件的大小=vm-page-size * vm-pages，如果使用默认的每页32byte及134217728页，将总计占用4GB的swap文件及16MB的RAM，最好根据应用实际情况来配置 ***需要注意VM特性在2.4版本中已废弃，后续不建议使用***
+
+## &emsp;&emsp;~~vm-max-threads~~  
+&emsp;&emsp;&emsp;&emsp;***@Deprecated***   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：4  
+&emsp;&emsp;&emsp;&emsp;content：`vm-max-threads 4`  
+&emsp;&emsp;&emsp;&emsp;虚拟IO线程的数量，虚拟IO线程用于对SWAP文件的读写，由于虚拟线程同时还负责内存和虚拟内存之间的编解码，因此在物理IO满足的情况下，调大该参数可以获得更好的读写效率 ***需要注意VM特性在2.4版本中已废弃，后续不建议使用***
+
+## &emsp;&emsp;hash-max-zipmap-entries     
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：512  
+&emsp;&emsp;&emsp;&emsp;content：`hash-max-zipmap-entries 512`  
+&emsp;&emsp;&emsp;&emsp;Redis的Hash对象将会被以特定的方式编码，从而节省内存。hash-max-zipmap-entries指明了当元素数量不超过多少时，使用这种编码结构
+
+## &emsp;&emsp;hash-max-zipmap-value   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：64  
+&emsp;&emsp;&emsp;&emsp;content：`hash-max-zipmap-value 64`  
+&emsp;&emsp;&emsp;&emsp;Redis的Hash对象将会被以特定的方式编码，从而节省内存。hash-max-zipmap-value指明了当元素大小不超过该值时，使用这种编码结构
+
+## &emsp;&emsp;list-max-ziplist-entries   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：512  
+&emsp;&emsp;&emsp;&emsp;content：`list-max-ziplist-entries 512`  
+&emsp;&emsp;&emsp;&emsp;Redis的List对象将会被以特定的方式编码，从而节省内存。list-max-ziplist-entries指明了当元素数量不超过该值时，使用这种编码结构
+
+## &emsp;&emsp;list-max-ziplist-value   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：64  
+&emsp;&emsp;&emsp;&emsp;content：`list-max-ziplist-value 64`  
+&emsp;&emsp;&emsp;&emsp;Redis的List对象将会被以特定的方式编码，从而节省内存。list-max-ziplist-value指明了当元素大小不超过该值时，使用这种编码结构
+
+## &emsp;&emsp;set-max-intset-entries   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：512  
+&emsp;&emsp;&emsp;&emsp;content：`set-max-intset-entries 512`  
+&emsp;&emsp;&emsp;&emsp;Redis会对64位以内的十进制整数的Set集合采用特殊编码，因此可以通过set-max-intset-entries来指明当集合内的元素数量不超过该值时，采用该编码形式
+
+## &emsp;&emsp;zset-max-ziplist-entries   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：128  
+&emsp;&emsp;&emsp;&emsp;content：`zset-max-ziplist-entries 128`  
+&emsp;&emsp;&emsp;&emsp;Redis会对ZSet集合采用特殊编码，因此可以通过zset-max-ziplist-entries来指明当集合内的元素数量不超过该值时，采用该编码形式
+
+## &emsp;&emsp;zset-max-ziplist-value   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：64  
+&emsp;&emsp;&emsp;&emsp;content：`zset-max-ziplist-value 64`  
+&emsp;&emsp;&emsp;&emsp;Redis会对ZSet集合采用特殊编码，因此可以通过zset-max-ziplist-entries来指明当集合内的元素大小不超过该值时，采用该编码形式
+
+## &emsp;&emsp;activerehashing   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：yes  
+&emsp;&emsp;&emsp;&emsp;content：`activerehashing yes`  
+&emsp;&emsp;&emsp;&emsp;是否激活重hash。重hash策略会占用1/100的cpu时间来对redis主hash表（redis最上层key的映射关系）进行重hash，主hash表采用延迟重hash的策略，对主hash表的访问越多，会推进rehash进程。因此当redis服务空闲时，rehash操作将不会完成，并额外占用一部分内存。激活rehash会造成约额外2毫秒的延迟，如果对延迟特别敏感可以考虑关闭该选项。但是如果对内存占用特别敏感，建议开启这个选项，可以尽快释放无关内存。
+
+## &emsp;&emsp;include   
+&emsp;&emsp;&emsp;&emsp;sinece：2.4  
+&emsp;&emsp;&emsp;&emsp;default：/path/to/local.conf  
+&emsp;&emsp;&emsp;&emsp;content：`include /path/to/local.conf`  
+&emsp;&emsp;&emsp;&emsp;可以配置一个或多个其他的配置文件，当前配置文件会和额外配置文件合并，作为最终的配置来加载redis
