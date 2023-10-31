@@ -233,7 +233,7 @@ redis.conf由一系列格式简单的配置项组成：
 |volatile-lru|在设置了过期时间的key范围内，淘汰最久未使用的key|
 |allkeys-lru|对所有的key执行LRU算法|
 |volatile-random|在设置了过期时间的key范围内，随机淘汰|
-|allkeys->random|对所有的key随机淘汰|
+|allkeys-random|对所有的key随机淘汰|
 |volatile-ttl|在设置了过期时间的key中，淘汰最接近过期时间的key|
 |noeviction|不淘汰|  
 
