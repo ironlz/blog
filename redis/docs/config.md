@@ -386,7 +386,7 @@ redis.conf由一系列格式简单的配置项组成：
 &emsp;&emsp;&emsp;&emsp;sinece：2.4  
 &emsp;&emsp;&emsp;&emsp;default：yes  
 &emsp;&emsp;&emsp;&emsp;content：`activerehashing yes`  
-&emsp;&emsp;&emsp;&emsp;是否激活重hash。重hash策略会占用1/100的cpu时间来对redis主hash表（redis最上层key的映射关系）进行重hash，主hash表采用延迟重hash的策略，对主hash表的访问越多，会推进rehash进程。因此当redis服务空闲时，rehash操作将不会完成，并额外占用一部分内存。激活rehash会造成约额外2毫秒的延迟，如果对延迟特别敏感可以考虑关闭该选项。但是如果对内存占用特别敏感，建议开启这个选项，可以尽快释放无关内存。
+&emsp;&emsp;&emsp;&emsp;是否激活重hash。重hash策略会占用1/100的cpu时间来对redis主hash表（redis最上层key的映射关系）进行重hash，主hash表采用延迟重hash的策略，对主hash表的访问越多，会推进rehash进程。因此当redis服务空闲时，rehash操作将不会完成，并额外占用一部分内存。激活rehash会造成约额外2毫秒的延迟，如果对延迟特别敏感可以考虑关闭该选项。但是如果对内存占用特别敏感，建议开启这个选项，可以尽快释放已被删除的key占用的物理内存。
 
 ## &emsp;&emsp;include   
 &emsp;&emsp;&emsp;&emsp;sinece：2.4  
