@@ -84,6 +84,15 @@ redis.conf由一系列格式简单的配置项组成：
 &emsp;&emsp;&emsp;&emsp;content：`timeout 0`  
 &emsp;&emsp;&emsp;&emsp;客户端空闲连接超时时间，单位为秒，默认为0（不超时）  
 
+## &emsp;&emsp;tcp-keepalive  
+&emsp;&emsp;&emsp;&emsp;sinece：2.6  
+&emsp;&emsp;&emsp;&emsp;default：0  
+&emsp;&emsp;&emsp;&emsp;content：`tcp-keepalive 0`  
+&emsp;&emsp;TCP连接的keepalive时间，单位为s，如果该配置项设置的为非零值，则通过设置SO_KEEPALIVE来进行客户端和服务端之间的连接保活，这样有两个好处：  
+&emsp;&emsp;1）检测不活跃的客户端  
+&emsp;&emsp;2）使连接在网络设备的角度上看使活的  
+&emsp;&emsp;在linux系统中，这个指定的值用来决定ACKs的发送周期，需要注意如果配置了这个，那么关闭一个连接的耗时就变成了这个时间的两倍。在其它的操作系统上，这个周期取决于内核配置。一个比较合理的值是将其设置为60s
+
 # &emsp;&emsp;loglevel  
 &emsp;&emsp;&emsp;&emsp;sinece：2.4  
 &emsp;&emsp;&emsp;&emsp;default：verbose  
